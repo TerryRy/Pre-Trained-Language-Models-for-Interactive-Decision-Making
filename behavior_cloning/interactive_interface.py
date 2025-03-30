@@ -132,7 +132,8 @@ def interactive_interface_fn(args, vh_envs, iteri, agent_model, data_info, loggi
     save_output = []
     camera_num = vh_envs.comm.camera_count()[1]
     save_data_all = []
-
+    # 谁懂啊定义了save_output没用，谁来补偿我的记录啊
+    output_file = args.output_file
 
     i = 0
     while 1:
@@ -185,7 +186,7 @@ def interactive_interface_fn(args, vh_envs, iteri, agent_model, data_info, loggi
                 ## ----------------------------------------------------------------------------------------------------
                 ## get action from model and check action
                 ## ----------------------------------------------------------------------------------------------------
-                action, obj = agent_model.get_action(data=data)
+                action, obj = agent_model.get_action(data=data, eval=args.eval)
 
                 action_logits = F.softmax(action[agent_id], dim=-1)
                 object_logits = F.softmax(obj[agent_id], dim=-1)
@@ -271,6 +272,14 @@ def interactive_interface_fn(args, vh_envs, iteri, agent_model, data_info, loggi
                     print('success example')
                     print('-------------------------------------------------------------------')
 
+        # save output
+        save_output.append({
+                "run_id": valid_run,
+                "goal": env_task_goal_write,
+                "actions": all_actions,
+                "rewards": [[reward.item() if reward is not None else None for reward in step_rewards.values()] for step_rewards in all_rewards],
+                "success": success_run_tem
+            })
             
         if args.interactive_eval:
             success_rate = 100. * success_count / valid_run if valid_run!=0 else 0
@@ -290,42 +299,20 @@ def interactive_interface_fn(args, vh_envs, iteri, agent_model, data_info, loggi
                                     args.test_examples, i+1, valid_run, success_count,
                                     success_rate))
 
+            summary = {
+                "total_runs": args.test_examples,
+                "current_run": i + 1,
+                "valid_runs": valid_run,
+                "success_count": success_count,
+                "success_rate": success_rate
+            }
+            # logging.info(json.dumps(summary, indent=4))  # 记录日志
+            save_output.append(summary)  # 追加到 `save_output`
+    
+    # 将 `save_output` 保存到 JSON 文件
+    with open(output_file, "w") as f:
+        json.dump(save_output, f, indent=4)
+
+    print(f"Output saved to {output_file}")  # 输出文件路径
+
     return success_rate
-
-        
-
-        
-
-
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

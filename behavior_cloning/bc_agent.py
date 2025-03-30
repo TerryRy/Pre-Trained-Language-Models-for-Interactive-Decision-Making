@@ -134,8 +134,8 @@ class BC_Agent(object):
 
 
 
-    def get_action(self, data, lstm_hidden=None):
-
+    def get_action(self, data, eval=False, lstm_hidden=None):
+        # just use to "get action", like forward
         self.model.eval()
         self.action_criterion.eval()
         self.obj_criterion.eval()
@@ -147,6 +147,21 @@ class BC_Agent(object):
 
             action, obj = self.model(data)
             return [action], [obj]
+
+            # 使用时需去掉上方no_grad()
+            # # 计算损失
+            # action_loss = self.action_criterion(action, data[0])  # 假设data[0]是action的目标
+            # obj_loss = self.obj_criterion(obj, data[1])  # 假设data[1]是obj的目标
+
+            # # 总损失
+            # loss = (action_loss + obj_loss) / 2
+
+            # # 反向传播
+            # self.optimizer.zero_grad()  # 清空之前的梯度
+            # loss.backward()  # 计算梯度
+            # self.optimizer.step()  # 更新模型参数
+
+            # return [action], [obj]
 
 
 

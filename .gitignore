@@ -12,3 +12,8 @@ behavior_cloning/*.pyc
 */*.DS_Store
 .DS_Store
 *.DS_Store
+
+modles
+data.zip
+unity_simulator.log
+virtualhome/dataset

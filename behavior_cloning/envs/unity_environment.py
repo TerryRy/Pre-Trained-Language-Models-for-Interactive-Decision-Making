@@ -17,6 +17,8 @@ sys.path.append('../virtualhome')
 from simulation.unity_simulator import comm_unity as comm_unity
 from vh_graph.envs import belief, vh_env
 
+from simulation.environment import utils as raw_utils_environment
+
 
 class UnityEnvironment(BaseEnvironment):
     def __init__(self,
@@ -152,7 +154,9 @@ class UnityEnvironment(BaseEnvironment):
 
         return reward, done, {'satisfied_goals': satisfied, 'unsatisfied_goals': unsatisfied}
 
-
+    # #### RAW REWARD for raw_reward is just an interface, here just for ensure, so set agent_i=0
+    # def reward(self):
+    #     self.reward(0)
 
     def check_edge(self, script_list, graph, agent_i, fix_edge=False):
         correct_graph_flag = True
@@ -166,6 +170,31 @@ class UnityEnvironment(BaseEnvironment):
 
         return correct_graph_flag, graph
         
+    #### RAW SETP, just for step, wiht no task
+    def raw_step(self, action_dict):
+        script_list = raw_utils_environment.convert_action(action_dict)
+        if len(script_list[0]) > 0:
+            success, message = self.comm.render_script(script_list,
+                                                        recording=False,
+                                                        skip_animation=True)
+            if not success:
+                print(message)
+            else:
+                self.changed_graph = True
+
+        # Obtain reward
+        reward, done, info = self.reward(0)
+
+        graph = self.get_graph()
+        self.steps += 1
+        
+        obs = self.get_observations()
+        
+        info['finished'] = done
+        info['graph'] = graph
+        if self.steps == self.max_episode_length:
+            done = True
+        return obs, reward, done, info
 
 
     def step(self, action_dict, ignore_walk=None, logging=None):
@@ -267,6 +296,77 @@ class UnityEnvironment(BaseEnvironment):
     
         self.env.reset(new_graph)
         self.env.to_pomdp()
+
+    #### RAW RESET, just for reset, with no task
+    def raw_reset(self, environment_graph=None, environment_id=None, init_rooms=None):
+        """
+        :param environment_graph: the initial graph we should reset the environment with
+        :param environment_id: which id to start
+        :param init_rooms: where to intialize the agents
+        """
+        self.env_id = environment_id
+        print("Resetting env", self.env_id)
+
+        if self.env_id is not None:
+            self.comm.reset(self.env_id)
+        else:
+            self.comm.reset()
+
+        s,g = self.comm.environment_graph()
+
+        #### TEST FOR NODE ####
+        print(s)
+        # print(g)
+        print("##############")
+        object_names = [node["class_name"] for node in g["nodes"]]
+        print("VirtualHome 里的对象列表:", object_names)
+        #### TEST DONE ####
+
+
+        if self.env_id not in self.max_ids.keys():
+            max_id = max([node['id'] for node in g['nodes']])
+            self.max_ids[self.env_id] = max_id
+
+        max_id = self.max_ids[self.env_id]
+        #print(max_id)
+        if environment_graph is not None:
+            # TODO: this should be modified to extend well
+            # updated_graph = utils.separate_new_ids_graph(environment_graph, max_id)
+            updated_graph = environment_graph
+            success, m = self.comm.expand_scene(updated_graph)
+        else:
+            success = True
+
+        if not success:
+            print("Error expanding scene")
+            pdb.set_trace()
+            return None
+        self.num_static_cameras = self.comm.camera_count()[1]
+
+        if init_rooms is None or init_rooms[0] not in ['kitchen', 'bedroom', 'livingroom', 'bathroom']:
+            rooms = self.rnd.sample(['kitchen', 'bedroom', 'livingroom', 'bathroom'], 2)
+        else:
+            rooms = list(init_rooms)
+
+        for i in range(self.num_agents):
+            if i in self.agent_info:
+                self.comm.add_character(self.agent_info[i], initial_room=rooms[i])
+            else:
+                self.comm.add_character()
+
+        _, self.init_unity_graph = self.comm.environment_graph()
+
+
+        self.changed_graph = True
+        graph = self.get_graph()
+        self.rooms = [(node['class_name'], node['id']) for node in graph['nodes'] if node['category'] == 'Rooms']
+        self.id2node = {node['id']: node for node in graph['nodes']}
+
+        obs = self.get_observations()
+        self.steps = 0
+        self.prev_reward = 0.
+
+        return obs
 
 
     def reset(self, environment_graph=None, task_id=None):

@@ -26,4 +26,4 @@ For interactive evaluation, run:
 sh scripts/inference.sh
 ```
 
-
+set `model_name_or_path` in `./behavior_cloning/scripts/inference.sh` as your modle path or modle name in `https://huggingface.co/`

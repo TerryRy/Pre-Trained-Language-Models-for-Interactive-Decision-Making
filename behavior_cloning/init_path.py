@@ -20,6 +20,11 @@ def initialize_path(args):
         
         env_task_set = [env for env in env_task_set if env['env_id'] == args.env_id]
         args.env_task_set = env_task_set
+    else:
+        # TODO: 超参数，随机策略概率
+        args.model_exploration_p = 0.5
+        # TODO: load task set but no data now
+        # args.env_task_set = generate_random_tasks(num_tasks=100)
 
     return args
 

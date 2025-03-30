@@ -28,7 +28,8 @@ def connect_env(args, logging=None):
     executable_args = {
         'file_name': args.exec_file,
         'x_display': args.display,
-        'no_graphics': not args.graphics
+        'no_graphics': not args.graphics,
+        'no_audio': not args.audio
     }
     
     vh_envs = UnityEnvironment(num_agents=args.n_agent,

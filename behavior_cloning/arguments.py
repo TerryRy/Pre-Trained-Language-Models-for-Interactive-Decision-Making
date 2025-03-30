@@ -11,6 +11,7 @@ def get_args():
     parser.add_argument('--exec_file', type=str, default='../virtualhome/simulation/unity_simulator/v2.2.5/linux_exec.v2.2.5_beta.x86_64')
     parser.add_argument('--base-port', type=int, default=8679)
     parser.add_argument('--graphics', action='store_true', default=False)
+    parser.add_argument('--audio', action='store_true', default=False)
     parser.add_argument('--display', type=str, default="")
     parser.add_argument('--use-editor', action='store_true', default=False, help='whether to use an editor or executable')
     
@@ -41,6 +42,9 @@ def get_args():
     parser.add_argument('--interactive_eval', action='store_true', default=False, help='interactive_eval')
     parser.add_argument('--interactive_eval_path', type=str, default='')
     parser.add_argument('--subset', type=str, default='InDistributation')
+
+    ## Output
+    parser.add_argument('--output_file', type=str, default='./Output/output_file.json')
     
     ## Checkpoint
     parser.add_argument('--save_dir', default='', help='directory to save agent logs (default: ./trained_models/)')

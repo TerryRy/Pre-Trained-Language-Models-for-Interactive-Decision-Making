@@ -105,13 +105,64 @@ def main_single(gpu, args):
     ## load pretrained model
     agent, best_top1, start_epoch = load_pretrained_model(args, agent, gpu, logging)
 
+    ################ FOR TEST DATASET ################
+    # vh_envs = utils_interactive_eval.connect_env(args, logging)
+    # vh_envs.raw_reset()
+
+    # actions = [
+    # "[WALK] <couch>",
+    # # "[WALK] <couch>",
+    # # "[FIND] <couch>",
+    # # "[WALK] <couch>",
+    # # "[SIT] <couch>"
+    # ]
+    # import utils
+    # actions = utils.convert_actions_agent(actions)
+    # for action in actions:
+    #     my_obs, reward, done, info = vh_envs.raw_step(action)
+    #     print(f"执行动作: {action}, 观察到: {my_obs}")
     
-    ## Testing
+    # # vh_envs = utils_interactive_eval.connect_env(args, logging)
+    # return
+    ############## DONE ###############
+
+
+
+
+    #### TRAINING LID ####
+    # # TODO: LOAD DATA not sure yet
+    # from torch.utils.data import DataLoader 
+    # trainloader = DataLoader(train_dataset, batch_size=32, shuffle=True)
+
+    # for epoch in range(args.train_epoch):
+    #     train_metrics = agent.run(trainloader, epoch, mode='train')
+    # logging.info(
+    #     f"Epoch {epoch}: "
+    #     f"Loss = {train_metrics[0]:.3f} | "
+    #     f"Action Acc = {train_metrics[4]:.2%} | "
+    #     f"Obj Acc = {train_metrics[5]:.2%}"
+    # ) # run()内部已经打过了，感觉没必要再来一次
+
+    # torch.save(model.state_dict(), "model_weights.pth")
+    #### DONE ####
+
+
+
+
+    #### ADG ####
+
+
+    #### DONE ####
+
+
+
+
+
+    #### Testing ####
     vh_envs = utils_interactive_eval.connect_env(args, logging)
     tokenizer = get_pretrained_tokenizer(model_type=args.model_type, model_name_or_path=args.model_name_or_path)
-
     interactive_eval_success_rate = interactive_interface_fn(args, vh_envs, iteri=0, agent_model=agent, data_info=args.data_info, logging=logging, tokenizer=tokenizer)
-    
+    #### DONE ####
 
 
 if __name__ == "__main__":

@@ -1,5 +1,5 @@
 eval "$(conda shell.bash hook)"
-conda activate pt1.8
+conda activate final
 
 base_port=8189
 
@@ -16,11 +16,12 @@ CUDA_VISIBLE_DEVICES=0 python inference.py \
 --max_episode_length 70 \
 --num_mini_batch 1 \
 --model_type 'gpt2' \
---model_name_or_path 'gpt2' \
+--model_name_or_path '../modles/gpt2/' \
 --seed ${seed} \
 --base-port ${base_port} \
 --eval \
 --subset ${subset} \
+--output_file './Output/interactive_eval_output.json' \
 --test_examples 100 \
 --interactive_eval \
 --interactive_eval_path interactive_eval/${subset}/seed${seed} \

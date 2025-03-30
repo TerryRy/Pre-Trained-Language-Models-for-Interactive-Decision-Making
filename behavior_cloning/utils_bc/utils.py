@@ -39,8 +39,18 @@ def load_pretrained_model(args, agent, gpu, logging):
             logging.info('loading pretrained model %s' % args.pretrained_model_dir)
             logging.info('-----------------------------------------------------------------------------------')
 
-            checkpoint = torch.load(args.pretrained_model_dir, map_location='cpu')
-            agent.model.load_state_dict(checkpoint)
+            if args.eval:
+                checkpoint = torch.load(args.pretrained_model_dir, map_location='cpu')
+                print("First 10 params before loading:", list(agent.model.large_language_model.parameters())[0].data[:10])
+                agent.model.load_state_dict(checkpoint, strict=False)
+                print("First 10 params after loading:", list(agent.model.large_language_model.parameters())[0].data[:10])
+                # # agent.model.load_state_dict(checkpoint)
+
+                state_dict = torch.load(f"{args.model_name_or_path}/pytorch_model.bin", map_location=torch.device('cpu'))  # 可换成 GPU
+                print("First 10 params before loading:", list(agent.model.large_language_model.parameters())[0].data[:10])
+                agent.model.load_state_dict(state_dict, strict=False)
+                print("First 10 params after loading:", list(agent.model.large_language_model.parameters())[0].data[:10])
+               
 
         else:
             logging.info('there is no pretrained model %s' % args.pretrained_model_dir)
