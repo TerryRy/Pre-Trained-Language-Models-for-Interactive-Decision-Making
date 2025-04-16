@@ -8,7 +8,7 @@ for seed in 0; do
 for subset in InDistributation NovelScenes NovelTasks; do
 
 base_port=$((base_port+2))
-
+# --model_name_or_path '../modles/gpt2/' \
 
 CUDA_VISIBLE_DEVICES=0 python inference.py \
 --gpus 1 \
@@ -16,7 +16,7 @@ CUDA_VISIBLE_DEVICES=0 python inference.py \
 --max_episode_length 70 \
 --num_mini_batch 1 \
 --model_type 'gpt2' \
---model_name_or_path '../modles/gpt2/' \
+--model_name_or_path '/home/user4/FINAL/Pre-Trained-Language-Models-for-Interactive-Decision-Making/modles/gpt2/' \
 --seed ${seed} \
 --base-port ${base_port} \
 --eval \

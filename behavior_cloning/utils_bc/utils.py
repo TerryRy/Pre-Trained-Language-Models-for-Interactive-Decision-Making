@@ -40,17 +40,41 @@ def load_pretrained_model(args, agent, gpu, logging):
             logging.info('-----------------------------------------------------------------------------------')
 
             if args.eval:
+                print("##############")
+                i = 0
+                for name, param in agent.model.state_dict().items():
+                    i+=1
+                    if i < 10:
+                        diff = torch.param.sum().item()
+                        print(f"stata like {name}: {diff}")
+                    else:
+                        break
                 checkpoint = torch.load(args.pretrained_model_dir, map_location='cpu')
-                print("First 10 params before loading:", list(agent.model.large_language_model.parameters())[0].data[:10])
                 agent.model.load_state_dict(checkpoint, strict=False)
-                print("First 10 params after loading:", list(agent.model.large_language_model.parameters())[0].data[:10])
-                # # agent.model.load_state_dict(checkpoint)
+                print("##############")
+                i = 0
+                for name, param in agent.model.state_dict().items():
+                    i+=1
+                    if i < 10:
+                        diff = torch.param.sum().item()
+                        print(f"stata like {name}: {diff}")
+                    else:
+                        break
 
-                state_dict = torch.load(f"{args.model_name_or_path}/pytorch_model.bin", map_location=torch.device('cpu'))  # 可换成 GPU
-                print("First 10 params before loading:", list(agent.model.large_language_model.parameters())[0].data[:10])
-                agent.model.load_state_dict(state_dict, strict=False)
-                print("First 10 params after loading:", list(agent.model.large_language_model.parameters())[0].data[:10])
-               
+                # agent.model.load_state_dict(checkpoint)
+                state_dict = torch.load("/home/user4/FINAL/Pre-Trained-Language-Models-for-Interactive-Decision-Making/modles/gpt2/pytorch_model.bin", map_location=torch.device('cpu'))  # 可换成 GPU
+                new_state_dict = {f"base.large_language_model.transformer.{k}": v for k, v in state_dict.items()}
+                # state_dict = torch.load(f"{args.model_name_or_path}/pytorch_model.bin", map_location=torch.device('cpu'))  # 可换成 GPU
+                agent.model.load_state_dict(new_state_dict, strict=False)   
+                print("##############")
+                i = 0
+                for name, param in agent.model.state_dict().items():
+                    i+=1
+                    if i < 10:
+                        print(f"stata like {name}: {diff}")
+                    else:
+                        break
+            
 
         else:
             logging.info('there is no pretrained model %s' % args.pretrained_model_dir)

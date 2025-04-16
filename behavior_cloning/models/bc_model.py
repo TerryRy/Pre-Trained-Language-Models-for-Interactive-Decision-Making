@@ -53,7 +53,7 @@ class GoalAttentionModel(nn.Module):
         args.model_type = args.model_type.lower()
         model_class, tokenizer_class = MODEL_CLASSES[args.model_type]
 
-        if self.args.language_model_type_pretrain=='train_scratch':
+        if self.args.language_model_type_pretrain=='train_scratch':# and False:
             print('large language model from scratch %s' % args.model_name_or_path)
             model_tem = model_class.from_pretrained(args.model_name_or_path)
             self.large_language_model = model_class(model_tem.config)
