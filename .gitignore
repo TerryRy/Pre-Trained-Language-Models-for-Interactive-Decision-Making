@@ -17,3 +17,7 @@ modles
 data.zip
 unity_simulator.log
 virtualhome/dataset
+
+programs_processed_precond_nograb_morepreconds.zip
+programs_processed_precond_nograb_morepreconds/
+gpt2/
